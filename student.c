@@ -1,70 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-struct Student {
-    char *name;
-    float exam1_marks[5];
-    float exam2_marks[5];
-    char grade1;
-    char grade2;
-};
+#include "student.h"
 
 const char *subject_names[] = {"Physics", "PSWC", "Mathematics", "Electrical", "Mechanical"};
 
-struct Student* createStudent();
-void inputStudentData(struct Student *student);
-float calculateAverage(float marks[], int size);
-char gradeAssignment(float avg);
-void generateGradeCard(struct Student *student);
-void destroyStudent(struct Student *student);
-
-int main() {
-    int num_students;
-    printf("Enter the number of students: ");
-    scanf("%d", &num_students);
-
-    for (int i = 0; i < num_students; i++) {
-        struct Student *student = createStudent();
-
-        printf("\nStudent %d:\n\n", i + 1);
-        inputStudentData(student);
-
-        float avg1 = calculateAverage(student->exam1_marks, 5);
-        float avg2 = calculateAverage(student->exam2_marks, 5);
-
-        student->grade1 = gradeAssignment(avg1);
-        student->grade2 = gradeAssignment(avg2);
-
-        generateGradeCard(student);
-
-        destroyStudent(student);
-    }
-
-    return 0;
-}
-
-struct Student* createStudent() {
-    struct Student *student = (struct Student*)malloc(sizeof(struct Student));
-    if (student == NULL) {
-        printf("Memory allocation failed\n");
-        exit(EXIT_FAILURE);
-    }
-    student->name = (char*)malloc(50 * sizeof(char));
+void inputStudentData(struct Student *student) {
+    student->name = (char *)malloc(50 * sizeof(char));
     if (student->name == NULL) {
         printf("Memory allocation failed\n");
         exit(EXIT_FAILURE);
     }
-    return student;
-}
 
-void inputStudentData(struct Student *student) {
     printf("Enter student name: ");
     scanf("%s", student->name);
 
+    student->exam1_marks = (float *)malloc(5 * sizeof(float));
+    if (student->exam1_marks == NULL) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Enter marks for exam 1:\n");
     for (int i = 0; i < 5; i++) {
         printf("Enter marks for %s: ", subject_names[i]);
         scanf("%f", &student->exam1_marks[i]);
+    }
+
+    student->exam2_marks = (float *)malloc(5 * sizeof(float));
+    if (student->exam2_marks == NULL) {
+        printf("Memory allocation failed\n");
+        exit(EXIT_FAILURE);
     }
 
     printf("Enter marks for exam 2:\n");
@@ -74,7 +40,7 @@ void inputStudentData(struct Student *student) {
     }
 }
 
-float calculateAverage(float marks[], int size) {
+float calculateAverage(float *marks, int size) {
     float sum = 0.0;
     for (int i = 0; i < size; i++) {
         sum += marks[i];
@@ -103,11 +69,26 @@ char gradeAssignment(float avg) {
 void generateGradeCard(struct Student *student) {
     printf("\n===== Grade Card =====\n");
     printf("Name: %s\n", student->name);
-    printf("Exam 1 Grade: %c\n", student->grade1);
-    printf("Exam 2 Grade: %c\n", student->grade2);
+
+    float avg1 = calculateAverage(student->exam1_marks, 5);
+    float avg2 = calculateAverage(student->exam2_marks, 5);
+
+    printf("Exam 1 Grade: %c\n", gradeAssignment(avg1));
+    printf("Exam 2 Grade: %c\n", gradeAssignment(avg2));
 }
 
-void destroyStudent(struct Student *student) {
+void freeStudentMemory(struct Student *student) {
     free(student->name);
-    free(student);
+    free(student->exam1_marks);
+    free(student->exam2_marks);
 }
+
+
+
+        
+
+ 
+
+  
+
+
